@@ -1,4 +1,6 @@
-FROM nvidia/cuda:10.2-cudnn8-devel-ubuntu16.04
+FROM nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
@@ -24,13 +26,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         vim \
         net-tools \
         python2.7 \
-        python3.5 \
+        python3.8 \
         iputils-ping \
         python3-pip \
         openssh-server \
         zip \
         unzip \
         libturbojpeg \
+        libturbojpeg-dev \
         libopenblas-dev \
         libnccl2=2.7.8-1+cuda10.2 \
         libnccl-dev=2.7.8-1+cuda10.2 \
@@ -47,8 +50,11 @@ RUN cd python && for req in $(cat requirements.txt) pydot; do pip install $req; 
     pip install protobuf && \
     mkdir build && cd build 
 
-RUN cd /opt/caffe/build && cmake -DUSE_CUDNN=1 -DUSE_NCCL=ON .. && \
-    make -j"$(nproc)"
+RUN cd $CAFFE_ROOT/build && cmake \
+    -DUSE_CUDNN=1 \
+    -DUSE_NCCL=ON \
+    -DJPEGTurbo_INCLUDE_DIR=/usr/lib/x86_64-linux-gnu \
+    .. && make -j "$(nproc)"
 
 RUN echo "export CAFFE_ROOT=/opt/caffe" >> /etc/profile
 
