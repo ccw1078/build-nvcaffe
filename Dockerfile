@@ -37,23 +37,36 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libopenblas-dev \
         libnccl2=2.7.8-1+cuda10.2 \
         libnccl-dev=2.7.8-1+cuda10.2 \
+        libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
+RUN wget https://imagelib-picture.oss-cn-shenzhen.aliyuncs.com/library/cmake-3.16.5.tar.gz && \
+    tar -zxvf cmake-3.16.5.tar.gz && \
+    cd cmake-3.16.5 && \
+    ./bootstrap && \
+    make -j "$(nproc)"  && \
+    make install && \
+    cd ..  && \
+    rm -rf cmake-3.16.5 && \
+    rm -rf cmake-3.16.5.tar.gz
+
 ENV CAFFE_ROOT=/opt/caffe
+
 WORKDIR $CAFFE_ROOT
 
 RUN pip install --upgrade pip
 
-RUN git clone -b caffe-0.17 --depth 1 https://github.com/NVIDIA/caffe . 
+RUN git clone -b caffe-0.15 --depth 1 https://github.com/NVIDIA/caffe .
 
 RUN cd python && for req in $(cat requirements.txt) pydot; do pip install $req; done && cd .. && \
     pip install protobuf && \
-    mkdir build && cd build 
+    mkdir build && cd build
 
-RUN cd $CAFFE_ROOT/build && cmake \
+RUN cd $CAFFE_ROOT && \
+    sed -i 's|set(Caffe_known_gpu_archs "20 21(20) 30 35 50")|set(Caffe_known_gpu_archs "30 35 37 50 52 60 61 70 75")|g' cmake/Cuda.cmake && \
+    cd build && cmake \
     -DUSE_CUDNN=1 \
     -DUSE_NCCL=ON \
-    -DJPEGTurbo_INCLUDE_DIR=/usr/lib/x86_64-linux-gnu \
     .. && make -j "$(nproc)"
 
 RUN echo "export CAFFE_ROOT=/opt/caffe" >> /etc/profile
@@ -87,5 +100,3 @@ RUN mkdir /root/.ssh
 RUN echo "$CAFFE_ROOT/build/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
 
 EXPOSE 22
-
-CMD    ["/usr/sbin/sshd", "-D"]
