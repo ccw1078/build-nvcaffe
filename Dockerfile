@@ -1,8 +1,10 @@
-FROM nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04
+FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y \
+        --no-install-recommends \
+        --allow-change-held-packages \
         build-essential \
         cmake \
         git \
@@ -35,12 +37,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libturbojpeg \
         libturbojpeg-dev \
         libopenblas-dev \
-        libnccl2=2.7.8-1+cuda10.2 \
-        libnccl-dev=2.7.8-1+cuda10.2 \
+        libnccl2=2.7.8-1+cuda10.1 \
+        libnccl-dev=2.7.8-1+cuda10.1 \
         libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN wget https://imagelib-picture.oss-cn-shenzhen.aliyuncs.com/library/cmake-3.16.5.tar.gz && \
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.16.5/cmake-3.16.5-Linux-x86_64.tar.gz && \
     tar -zxvf cmake-3.16.5.tar.gz && \
     cd cmake-3.16.5 && \
     ./bootstrap && \
