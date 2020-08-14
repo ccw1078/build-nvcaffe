@@ -42,15 +42,15 @@ RUN apt-get update && apt-get install -y \
         libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN wget https://github.com/Kitware/CMake/releases/download/v3.16.5/cmake-3.16.5-Linux-x86_64.tar.gz && \
-    tar -zxvf cmake-3.16.5.tar.gz && \
-    cd cmake-3.16.5 && \
-    ./bootstrap && \
-    make -j "$(nproc)"  && \
-    make install && \
-    cd ..  && \
-    rm -rf cmake-3.16.5 && \
-    rm -rf cmake-3.16.5.tar.gz
+RUN wget https://imagelib-picture.oss-cn-shenzhen.aliyuncs.com/library/cmake-3.16.5.tar.gz && \
+        tar -zxvf cmake-3.16.5.tar.gz && \
+        cd cmake-3.16.5 && \
+        ./bootstrap && \
+        make -j "$(nproc)"  && \
+        make install && \
+        cd ..  && \
+        rm -rf cmake-3.16.5 && \
+        rm -rf cmake-3.16.5.tar.gz
 
 ENV CAFFE_ROOT=/opt/caffe
 
