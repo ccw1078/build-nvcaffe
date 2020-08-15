@@ -4,9 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
         --no-install-recommends \
-        --allow-change-held-packages \
         build-essential \
-        cmake \
         git \
         wget \
         libatlas-base-dev \
@@ -37,26 +35,16 @@ RUN apt-get update && apt-get install -y \
         libturbojpeg \
         libturbojpeg-dev \
         libopenblas-dev \
-        libnccl2=2.7.8-1+cuda10.1 \
-        libnccl-dev=2.7.8-1+cuda10.1 \
+        libnccl2=2.4.8-1+cuda10.1 \
+        libnccl-dev=2.4.8-1+cuda10.1 \
         libssl-dev \
     && rm -rf /var/lib/apt/lists/*
-
-RUN wget https://imagelib-picture.oss-cn-shenzhen.aliyuncs.com/library/cmake-3.16.5.tar.gz && \
-        tar -zxvf cmake-3.16.5.tar.gz && \
-        cd cmake-3.16.5 && \
-        ./bootstrap && \
-        make -j "$(nproc)"  && \
-        make install && \
-        cd ..  && \
-        rm -rf cmake-3.16.5 && \
-        rm -rf cmake-3.16.5.tar.gz
 
 ENV CAFFE_ROOT=/opt/caffe
 
 WORKDIR $CAFFE_ROOT
 
-RUN pip install --upgrade pip
+RUN pip install --upgrade pip && pip install cmake
 
 RUN git clone -b caffe-0.15 --depth 1 https://github.com/NVIDIA/caffe .
 
